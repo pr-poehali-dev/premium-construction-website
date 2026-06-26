@@ -547,7 +547,7 @@ export default function Index() {
             <div className="space-y-6">
               {[
                 { icon: 'Phone', t: 'Телефон', d: '8 (977) 897-98-18' },
-                { icon: 'Mail', t: 'Почта', d: 'info@gk-remont.ru' },
+                { icon: 'Mail', t: 'Почта', d: 'remontmnogoprofi@yandex.ru' },
                 { icon: 'MapPin', t: 'Работаем', d: 'Москва и Московская область' },
                 { icon: 'Clock', t: 'Часы работы', d: 'Ежедневно 9:00 — 20:00' },
               ].map((c) => (
