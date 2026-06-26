@@ -14,6 +14,7 @@ const NAV = [
   { id: 'about', label: 'О компании' },
   { id: 'services', label: 'Услуги' },
   { id: 'portfolio', label: 'Портфолио' },
+  { id: 'calc', label: 'Калькулятор' },
   { id: 'process', label: 'Процесс' },
   { id: 'reviews', label: 'Отзывы' },
   { id: 'faq', label: 'Вопросы' },
@@ -96,6 +97,18 @@ const REVIEWS = [
   },
 ];
 
+const CALC_TYPES = [
+  { id: 'apartment', label: 'Квартира', icon: 'PaintRoller', base: 8000 },
+  { id: 'facade', label: 'Фасад', icon: 'Layers', base: 3500 },
+  { id: 'house', label: 'Дом / коттедж', icon: 'Home', base: 11000 },
+];
+
+const CALC_LEVELS = [
+  { id: 'standart', label: 'Стандарт', mult: 1 },
+  { id: 'comfort', label: 'Комфорт', mult: 1.4 },
+  { id: 'premium', label: 'Премиум', mult: 2 },
+];
+
 const FAQ = [
   { q: 'Сколько лет вы на рынке?', a: 'Более 10 лет занимаемся фасадными работами и отделкой квартир, частных домов и коттеджей.' },
   { q: 'Даёте ли вы гарантию?', a: 'Да, мы предоставляем официальную гарантию на все виды выполненных работ, зафиксированную в договоре.' },
@@ -105,6 +118,11 @@ const FAQ = [
 
 export default function Index() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [calcType, setCalcType] = useState(CALC_TYPES[0]);
+  const [calcLevel, setCalcLevel] = useState(CALC_LEVELS[0]);
+  const [area, setArea] = useState(60);
+
+  const total = Math.round(calcType.base * calcLevel.mult * area);
 
   const scrollTo = (id: string) => {
     setMenuOpen(false);
@@ -330,8 +348,118 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Calculator */}
+      <section id="calc" className="py-28 bg-card/40 border-t border-border">
+        <div className="container">
+          <div className="text-center mb-16">
+            <SectionLabel center>Калькулятор</SectionLabel>
+            <h2 className="font-display text-4xl md:text-5xl">
+              Рассчитайте <span className="gold-gradient-text">стоимость</span>
+            </h2>
+            <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
+              Предварительный расчёт по типу объекта и уровню отделки. Точную смету
+              подготовим после консультации.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div className="space-y-8">
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-gold mb-4">Тип объекта</div>
+                <div className="grid grid-cols-3 gap-3">
+                  {CALC_TYPES.map((t) => (
+                    <button
+                      key={t.id}
+                      onClick={() => setCalcType(t)}
+                      className={`p-4 flex flex-col items-center gap-2 transition-colors ${
+                        calcType.id === t.id
+                          ? 'bg-gold/10 gold-border text-foreground'
+                          : 'border border-border text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Icon name={t.icon} size={24} className={calcType.id === t.id ? 'text-gold' : ''} />
+                      <span className="text-sm text-center leading-tight">{t.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-xs uppercase tracking-[0.2em] text-gold mb-4">Уровень отделки</div>
+                <div className="grid grid-cols-3 gap-3">
+                  {CALC_LEVELS.map((l) => (
+                    <button
+                      key={l.id}
+                      onClick={() => setCalcLevel(l)}
+                      className={`py-3 text-sm transition-colors ${
+                        calcLevel.id === l.id
+                          ? 'bg-gold/10 gold-border text-foreground'
+                          : 'border border-border text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {l.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-xs uppercase tracking-[0.2em] text-gold">Площадь</div>
+                  <div className="font-display text-2xl text-foreground">{area} м²</div>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={500}
+                  step={5}
+                  value={area}
+                  onChange={(e) => setArea(Number(e.target.value))}
+                  className="w-full accent-gold cursor-pointer"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>10 м²</span>
+                  <span>500 м²</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-background gold-border p-8 md:p-10 flex flex-col justify-center">
+              <div className="text-xs uppercase tracking-[0.2em] text-gold mb-3">Примерная стоимость</div>
+              <div className="font-display text-5xl md:text-6xl gold-gradient-text mb-2">
+                {total.toLocaleString('ru-RU')} ₽
+              </div>
+              <div className="text-sm text-muted-foreground mb-8">
+                {calcType.label} · {calcLevel.label} · {area} м²
+              </div>
+              <div className="space-y-3 mb-8">
+                {[
+                  { l: 'Цена за м²', v: `${Math.round(calcType.base * calcLevel.mult).toLocaleString('ru-RU')} ₽` },
+                  { l: 'Гарантия на работы', v: 'до 5 лет' },
+                  { l: 'Выезд и замер', v: 'бесплатно' },
+                ].map((r) => (
+                  <div key={r.l} className="flex justify-between text-sm border-b border-border/50 pb-3">
+                    <span className="text-muted-foreground">{r.l}</span>
+                    <span className="text-foreground">{r.v}</span>
+                  </div>
+                ))}
+              </div>
+              <Button
+                onClick={() => scrollTo('contacts')}
+                className="w-full bg-gold text-primary-foreground hover:bg-gold/90 rounded-none h-12 text-base"
+              >
+                Получить точную смету
+              </Button>
+              <p className="text-xs text-muted-foreground text-center mt-4">
+                Расчёт предварительный и не является публичной офертой
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Process */}
-      <section id="process" className="py-28 bg-card/40 border-t border-border">
+      <section id="process" className="py-28 border-t border-border">
         <div className="container">
           <div className="text-center mb-16">
             <SectionLabel center>Процесс работы</SectionLabel>
